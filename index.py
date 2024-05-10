@@ -2,4 +2,8 @@ import pywebio
 
 from network_snip import main
 
-pywebio.platform.flask.wsgi_app(main)
+app =  pywebio.platform.flask.wsgi_app(main)
+
+@app.get('/')
+def hello_world():
+    return "Hello, World!"
