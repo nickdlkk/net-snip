@@ -2,7 +2,7 @@ import os
 from dotenv_vault import load_dotenv
 import sys
 
-load_dotenv(verbose=True)
+load_dotenv()
 
 # 获取第一个参数
 if len(sys.argv) > 1:
