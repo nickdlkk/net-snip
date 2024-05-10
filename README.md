@@ -33,4 +33,4 @@ python main.py
 
 # 部署
 ## Vercel
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Faurora-develop%2Faurora&env=STREAM_MODE&project-name=aurora&repository-name=aurora)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fnickdlkk%2Fnet_snip&env=STREAM_MODE&project-name=net_snip&repository-name=net_snip)
