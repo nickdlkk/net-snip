@@ -2,7 +2,10 @@ import os
 from dotenv_vault import load_dotenv
 import sys
 
-load_dotenv()
+try:
+    load_dotenv()
+except FileNotFoundError:
+    print(".env file not found! Using default or fallback settings.")
 
 # 获取第一个参数
 if len(sys.argv) > 1:
