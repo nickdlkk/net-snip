@@ -20,8 +20,8 @@ if len(sys.argv) > 1:
 class Config:
     sqlite_db_name = 'net_snip.db'
     default_word_length = 5
-    db_host = os.getenv("host")
-    db_port = os.getenv("port")
-    db_database = os.getenv("database")
-    db_user = os.getenv("user")
-    db_password = os.getenv("password")
+    db_host = os.getenv("POSTGRES_HOST")
+    db_port = os.getenv("POSTGRES_PORT")
+    db_database = os.getenv("POSTGRES_DATABASE")
+    db_user = os.getenv("POSTGRES_USER")
+    db_password = os.getenv("POSTGRES_PASSWORD")
