@@ -13,13 +13,13 @@ import model
 import store
 import pywebio_battery
 
-from net_snip.config import Config
+from config import Config
 from pywebio.session import local
 
-from net_snip.utils.Debounce import Debounce
+from utils.Debounce import Debounce
 import datetime
 
-from net_snip.view import View
+from view import View
 
 debouncer = Debounce(5)  # 创建一个防抖对象，设置间隔时间为5秒
 
@@ -41,11 +41,14 @@ def main():
     else:
         snip(key, pwd)
 
+
 def rander_update_password():
     with use_scope(View.password_scop, clear=True):
         put_text("update password:")
         put_input(View.update_password, type=PASSWORD)
         put_button("update password", onclick=change_password)
+
+
 def snip(key, password):
     local.key = key
     # model.save_key(key)
@@ -77,7 +80,9 @@ def snip(key, password):
         ## Write your Content With Markdown
         """)
         with use_scope(View.update_time_scop):
-            put_text("content update time:", datetime.datetime.fromtimestamp(content_value[0]["content_update_time"]))
+            time_ = content_value[0]["content_update_time"]
+            if time_ is not None:
+                put_text("content update time:", datetime.datetime.fromtimestamp(time_))
         put_textarea('md_text', rows=18, code={'mode': 'markdown'}, value=content_value[0]["value"])
 
         put_buttons(['Download content'], lambda _: download('saved.md', pin.md_text.encode('utf8')), small=True)
@@ -86,13 +91,15 @@ def snip(key, password):
         put_markdown('## Preview')
 
         with use_scope('md', clear=True):
-            put_markdown(content_value[0]["value"], sanitize=False)
+            value_ = content_value[0]["value"]
+            if value_ is not None:
+                put_markdown(value_, sanitize=False)
 
         while True:
             change_detail = pin_wait_change('md_text')
             with use_scope('md', clear=True):
                 put_markdown(change_detail['value'], sanitize=False)
-                pin_wait__change_save(change_detail)
+                pin_wait_change_save(change_detail)
 
 
 def change_password():

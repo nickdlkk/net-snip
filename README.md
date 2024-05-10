@@ -27,3 +27,10 @@ python main.py
 5. [ ] 支持上传文件
 6. [ ] 系统初始化/重置,清空数据库数据
 7. [ ] 安全加固
+8. [ ] 增加分享超时时间
+9. [ ] 增加查看次数
+10. [ ] Vercel部署
+
+# 部署
+## Vercel
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Faurora-develop%2Faurora&env=STREAM_MODE&project-name=aurora&repository-name=aurora)
