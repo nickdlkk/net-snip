@@ -1,9 +1,3 @@
-"""
-网络剪辑版
-1. 复用Markdown Previewer Demo
-2. 数据保存到Sqlite
-3.
-"""
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *

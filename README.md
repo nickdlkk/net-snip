@@ -1,5 +1,5 @@
 # 使用PyWebIO打造的网络剪辑板
-数据库使用SQLite
+使用SQLite保存的英文单词作为密钥。数据库使用PostgreSQL，方便部署到云服务
 
 包含密码访问，自动保存，支持MarkDown格式。
 
@@ -8,11 +8,16 @@
 ```bash
 pip install -r requirements.txt
 ```
+## Test
+
+```bash
+python network_snip.py
+```
 
 ## 运行
 
 ```bash
-python main.py
+python index.py
 ```
 
 ## 使用
@@ -30,6 +35,7 @@ python main.py
 8. [ ] 增加分享超时时间
 9. [ ] 增加查看次数
 10. [ ] Vercel部署
+11. [ ] Dockerfile
 
 # 部署
 ## Vercel
