@@ -3,16 +3,14 @@ import psycopg2
 import random
 import string
 from config import Config
-import time
 import datetime
 
 
 def random_string(length):
-    with psycopg2.connect(host=Config.db_host,
-                          port=Config.db_port,
-                          database=Config.db_database,
-                          user=Config.db_user,
-                          password=Config.db_password) as conn:
+    """
+    获取随机生成的
+    """
+    with sqlite3.connect(Config.sqlite_db_name) as conn:
         random_string_str = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
         select_random = "SELECT 'key' FROM enwords where 'key' like '{word}';"
         cursor = conn.cursor()
@@ -105,7 +103,7 @@ def update_password(key_id, password):
                           user=Config.db_user,
                           password=Config.db_password) as conn:
         cursor = conn.cursor()
-        update = "UPDATE snip_key SET password = ? WHERE id = %s;"
+        update = "UPDATE snip_key SET password = %s WHERE id = %s;"
         cursor.execute(update, (password, key_id))
         conn.commit()
 

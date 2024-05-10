@@ -14,8 +14,10 @@ from utils.Debounce import Debounce
 import datetime
 
 from view import View
+from db import db_init
 
 debouncer = Debounce(5)  # 创建一个防抖对象，设置间隔时间为5秒
+db_init.init()
 
 
 def main():
