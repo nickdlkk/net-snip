@@ -73,8 +73,8 @@ def snip(key, password):
 
         rander_update_password()
 
-        put_text("create time:", datetime.datetime.fromtimestamp(content_value[0]["create_time"]))
-        put_text("update time:", datetime.datetime.fromtimestamp(content_value[0]["update_time"]))
+        put_text("create time:", content_value[0]["create_time"])
+        put_text("update time:", content_value[0]["update_time"])
         put_markdown("""# Markdown Live Preview
         The online markdown editor with live preview. The source code of this application is [here](https://github.com/wang0618/PyWebIO/blob/dev/demos/markdown_previewer.py).
         ## Write your Content With Markdown
@@ -82,7 +82,7 @@ def snip(key, password):
         with use_scope(View.update_time_scop):
             time_ = content_value[0]["content_update_time"]
             if time_ is not None:
-                put_text("content update time:", datetime.datetime.fromtimestamp(time_))
+                put_text("content update time:", time_)
         put_textarea('md_text', rows=18, code={'mode': 'markdown'}, value=content_value[0]["value"])
 
         put_buttons(['Download content'], lambda _: download('saved.md', pin.md_text.encode('utf8')), small=True)
@@ -124,10 +124,10 @@ def save_content(val):
     key_id = local.key_id
     print("save key_id:{}".format(key_id))
     print(pin['md_text'])
-    time_now = int(datetime.datetime.now().timestamp())
+    time_now = datetime.datetime.now()
     model.save_content(key_id, pin['md_text'], time_now)
     with use_scope(View.update_time_scop, clear=True):
-        put_text("content update time:", datetime.datetime.fromtimestamp(time_now))
+        put_text("content update time:", time_now)
     toast("save success!", color='success')
 
 
