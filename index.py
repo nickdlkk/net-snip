@@ -2,5 +2,4 @@ import pywebio
 
 from network_snip import main
 
-app = pywebio.platform.flask.wsgi_app(main)
-app.run()
+pywebio.platform.flask.start_server(main)
