@@ -10,10 +10,8 @@ except FileNotFoundError:
 # 获取第一个参数
 if len(sys.argv) > 1:
     env_state = sys.argv[1]
-    print(f".env.{env_state}")
+    print(f"load .env.{env_state}")
     # 加载特定环境的环境变量
-    # 第一个参数如果获取不到对应文件需要写成绝对路径 借助Path(__file__)获取路径
-    # 第二个参数override=True表示当已存在同名环境变量时 用特定的环境变量值进行覆盖
     load_dotenv(f".env.{env_state}", override=True)
 
 
@@ -25,3 +23,7 @@ class Config:
     db_database = os.getenv("POSTGRES_DATABASE")
     db_user = os.getenv("POSTGRES_USER")
     db_password = os.getenv("POSTGRES_PASSWORD")
+    file_limit_size = os.getenv("FILE_LIMIT_SIZE") if os.getenv(
+        "FILE_LIMIT_SIZE") is None else "5M"  # 500(byte), 40K, 3M
+    file_limit_total_size = os.getenv("FILE_LIMIT_TOTAL_SIZE") if os.getenv(
+        "FILE_LIMIT_TOTAL_SIZE") is None else "50M"  # 500(byte), 40K, 3M

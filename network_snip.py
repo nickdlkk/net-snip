@@ -5,6 +5,7 @@ from pywebio.pin import *
 from pywebio.session import set_env, download, info, run_js, register_thread
 import model
 import store
+import service
 import pywebio_battery
 
 from config import Config
@@ -21,7 +22,7 @@ db_init.init()
 
 
 def main():
-    set_env(output_animation=False)
+    set_env(title='网络剪贴板', output_animation=False)
     key = pywebio_battery.get_query("key")
     pwd = pywebio_battery.get_query("password")
     if key is None:
@@ -75,6 +76,8 @@ def snip(key, password):
         The online markdown editor with live preview. The source code of this application is [here](https://github.com/wang0618/PyWebIO/blob/dev/demos/markdown_previewer.py).
         ## Write your Content With Markdown
         """)
+        render_file_scop()
+
         with use_scope(View.update_time_scop):
             time_ = content_value[0]["content_update_time"]
             if time_ is not None:
@@ -96,6 +99,32 @@ def snip(key, password):
             with use_scope('md', clear=True):
                 put_markdown(change_detail['value'], sanitize=False)
                 pin_wait_change_save(change_detail)
+
+
+def render_file_scop():
+    with use_scope('files', clear=True):
+        put_file_upload("SelectFile", label='Upload File', accept="*/*", multiple=True,
+                        max_size=Config.file_limit_size,
+                        max_total_size=Config.file_limit_total_size)
+        put_button('Upload', onclick=file_upload_onclick)
+        files = model.list_file(local.key_id)
+        for file in files:
+            put_link("{} (size :{} create time: {}".format(file['file_name'], file['file_size'],
+                                                           file['create_time'].strftime("%Y-%m-%d %H:%M:%S")),
+                     url="/download?m={}&fid={}&kid={}".format(file['file_md5'],file['id'],local.key_id),
+                     new_window=True)
+        # put_button('Download', onclick=lambda _: pin.file.download_file(model.download_file))
+
+def file_upload_onclick():
+    print(f'file_upload_onclick')
+    files = pin['SelectFile']
+    if files is None or len(files) == 0:
+        toast("请选择文件.")
+        return
+    return_str = service.upload_file(local.key_id, files)
+    toast(return_str)
+    if return_str == "上传成功":
+        render_file_scop()
 
 
 def change_password():

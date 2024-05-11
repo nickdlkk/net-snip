@@ -4,6 +4,7 @@ import random
 import string
 from config import Config
 import datetime
+import hashlib
 
 
 def random_string(length):
@@ -118,3 +119,87 @@ def save_content(key_id, content, time):
         cursor = conn.cursor()
         cursor.execute(insert_sql, (key_id, content, time))
         conn.commit()
+
+
+def insert_file(key_id, file, file_md5, file_name, file_size):
+    with psycopg2.connect(host=Config.db_host,
+                          port=Config.db_port,
+                          database=Config.db_database,
+                          user=Config.db_user,
+                          password=Config.db_password) as conn:
+        insert_sql = "INSERT INTO snip_files (key_id, file, file_md5, create_time,file_name,file_size) VALUES(%s, %s, %s, %s, %s, %s);"
+        cursor = conn.cursor()
+        cursor.execute(insert_sql,
+                       (key_id, psycopg2.Binary(file), file_md5, datetime.datetime.now(), file_name, file_size))
+        conn.commit()
+
+
+def list_file(key_id):
+    with psycopg2.connect(host=Config.db_host,
+                          port=Config.db_port,
+                          database=Config.db_database,
+                          user=Config.db_user,
+                          password=Config.db_password) as conn:
+        cursor = conn.cursor()
+        select = 'SELECT id,key_id,create_time,file_name,file_size,file_md5 from snip_files where key_id = %s order by create_time desc;'
+        cursor.execute(select, (key_id,))
+        results = cursor.fetchall()  # 获取所有查询结果
+        cursor.close()
+        if results is None:
+            results = []
+        # 获取列名
+        columns = [col[0] for col in cursor.description]
+        # 将每行数据转换为字典
+        result_dicts = [dict(zip(columns, row)) for row in results]
+        return result_dicts
+
+
+def get_key_file_total_size(key_id):
+    with psycopg2.connect(host=Config.db_host,
+                          port=Config.db_port,
+                          database=Config.db_database,
+                          user=Config.db_user,
+                          password=Config.db_password) as conn:
+        cursor = conn.cursor()
+        select = 'select SUM(file_size) from snip_files where key_id = %s;'
+        cursor.execute(select, (key_id,))
+        results = cursor.fetchone()  # 获取所有查询结果
+        cursor.close()
+        if results is not None:
+            if results[0] is None:
+                return 0
+            return results[0]
+        else:
+            return 0
+
+
+def get_file(id, key_id):
+    with psycopg2.connect(host=Config.db_host,
+                          port=Config.db_port,
+                          database=Config.db_database,
+                          user=Config.db_user,
+                          password=Config.db_password) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT file, file_md5,file_name FROM snip_files WHERE id = %s and key_id = %s", (id, key_id))
+        file_data, stored_md5_hash, file_name = cur.fetchone()
+        cur.close()
+        return file_data, file_name
+
+
+if __name__ == '__main__':
+    file = open("index.py", 'rb').read()
+    md5 = hashlib.md5(file).hexdigest()
+    insert_file(1, file, md5, "index.py")
+
+    file_list = list_file(1)
+    print(file_list)
+    for file in file_list:
+        file_data = get_file(file['id'], file['key_id'])
+        file_data_bytes = bytes(file_data)
+        # 尝试以 UTF-8 编码解码字节串
+        try:
+            file_data_str = file_data_bytes.decode('utf-8')
+        except UnicodeDecodeError:
+            file_data_str = "无法以 UTF-8 编码解码此二进制数据"
+
+        print(file_data_str)
