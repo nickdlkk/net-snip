@@ -27,5 +27,6 @@ class Config:
     db_database = os.getenv("POSTGRES_DATABASE")
     db_user = os.getenv("POSTGRES_USER")
     db_password = os.getenv("POSTGRES_PASSWORD")
-    file_limit_size = os.getenv("FILE_LIMIT_SIZE")
-    file_limit_total_size = os.getenv("FILE_LIMIT_TOTAL_SIZE")
+    file_limit_size = os.getenv("FILE_LIMIT_SIZE") if os.getenv("FILE_LIMIT_SIZE") is not None else "5M"
+    file_limit_total_size = os.getenv("FILE_LIMIT_TOTAL_SIZE") if os.getenv(
+        "FILE_LIMIT_TOTAL_SIZE") is not None else "50M"
