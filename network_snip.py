@@ -27,7 +27,7 @@ def main():
     if key is None:
         put_button("generate new key", onclick=generate_new_key)
         key = input("输入key")
-        result = model.check_key_exist()
+        result = model.check_key_exist(key)
         if result is None:
             model.save_key(key, "")
         js = """
