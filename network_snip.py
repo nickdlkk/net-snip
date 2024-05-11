@@ -24,19 +24,33 @@ db_init.init()
 def main():
     set_env(title='网络剪贴板', output_animation=False)
     key = pywebio_battery.get_query("key")
-    pwd = pywebio_battery.get_query("password")
     if key is None:
-        key = model.get_new_key(Config.default_word_length)
-        # 生成新key后跳转
+        put_button("generate new key", onclick=generate_new_key)
+        key = input("输入key")
+        result = model.check_key_exist()
+        if result is None:
+            model.save_key(key, "")
         js = """
-        let url = new URL(window.location.href);
-        url.searchParams.set('key', key);
-        window.location.href = url.toString();
-        """
-        model.save_key(key, "")
+                let url = new URL(window.location.href);
+                url.searchParams.set('key', key);
+                window.location.href = url.toString();
+                """
         run_js(js, key=key)
     else:
+        pwd = pywebio_battery.get_query("password")
         snip(key, pwd)
+
+
+def generate_new_key():
+    key = model.get_new_key(Config.default_word_length)
+    # 生成新key后跳转
+    js = """
+            let url = new URL(window.location.href);
+            url.searchParams.set('key', key);
+            window.location.href = url.toString();
+            """
+    model.save_key(key, "")
+    run_js(js, key=key)
 
 
 def rander_update_password():
@@ -111,9 +125,10 @@ def render_file_scop():
         for file in files:
             put_link("{} (size :{} create time: {}".format(file['file_name'], file['file_size'],
                                                            file['create_time'].strftime("%Y-%m-%d %H:%M:%S")),
-                     url="/download?m={}&fid={}&kid={}".format(file['file_md5'],file['id'],local.key_id),
+                     url="/download?m={}&fid={}&kid={}".format(file['file_md5'], file['id'], local.key_id),
                      new_window=True)
         # put_button('Download', onclick=lambda _: pin.file.download_file(model.download_file))
+
 
 def file_upload_onclick():
     print(f'file_upload_onclick')

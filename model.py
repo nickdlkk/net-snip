@@ -44,6 +44,20 @@ def get_new_key(word_length):
         return random_string_str
 
 
+def check_key_exist(key_name):
+    with psycopg2.connect(host=Config.db_host,
+                          port=Config.db_port,
+                          database=Config.db_database,
+                          user=Config.db_user,
+                          password=Config.db_password) as conn:
+        cursor = conn.cursor()
+        select = 'SELECT id FROM snip_key where key = %s;'
+        cursor.execute(select, (key_name,))
+        result = cursor.fetchone()
+        cursor.close()
+        return result
+
+
 def save_key(key, password):
     with psycopg2.connect(host=Config.db_host,
                           port=Config.db_port,

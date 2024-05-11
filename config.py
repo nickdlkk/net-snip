@@ -3,9 +3,13 @@ from dotenv_vault import load_dotenv
 import sys
 
 try:
-    load_dotenv()
+    load_dotenv(override=True)
 except FileNotFoundError:
-    print(".env file not found! Using default or fallback settings.")
+    print(".env file not found! Using default settings.")
+    try:
+        load_dotenv(f".env.default")
+    except FileNotFoundError:
+        print(".env.default file not found! No setting to load.")
 
 # 获取第一个参数
 if len(sys.argv) > 1:
@@ -23,7 +27,5 @@ class Config:
     db_database = os.getenv("POSTGRES_DATABASE")
     db_user = os.getenv("POSTGRES_USER")
     db_password = os.getenv("POSTGRES_PASSWORD")
-    file_limit_size = os.getenv("FILE_LIMIT_SIZE") if os.getenv(
-        "FILE_LIMIT_SIZE") is None else "5M"  # 500(byte), 40K, 3M
-    file_limit_total_size = os.getenv("FILE_LIMIT_TOTAL_SIZE") if os.getenv(
-        "FILE_LIMIT_TOTAL_SIZE") is None else "50M"  # 500(byte), 40K, 3M
+    file_limit_size = os.getenv("FILE_LIMIT_SIZE")
+    file_limit_total_size = os.getenv("FILE_LIMIT_TOTAL_SIZE")
