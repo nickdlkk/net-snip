@@ -42,7 +42,9 @@ def main():
         pwd = pywebio_battery.get_query("password")
         snip(key, pwd)
     # 主程序需要保活,用于在Vercel等无服务上保持运行
-    hold()
+    # hold()
+    test = input("test")
+    put_text(test)
 
 
 def generate_new_key():
