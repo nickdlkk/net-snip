@@ -141,7 +141,9 @@ def file_upload_onclick():
     if files is None or len(files) == 0:
         toast("请选择文件.")
         return
-    return_str = service.upload_file(local.key_id, files)
+    with put_loading(shape='grow'):
+        put_text("Uploading File...")
+        return_str = service.upload_file(local.key_id, files)
     toast(return_str)
     if return_str == "上传成功":
         render_file_scop()
