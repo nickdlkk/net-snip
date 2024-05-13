@@ -1,14 +1,40 @@
-FROM python:3.11.0
+FROM python:3.11.0-buster as builder
+
+WORKDIR /usr/src/wheels
+
+RUN pip install -U \
+    pip \
+    setuptools \
+    wheel
+
+COPY requirements.txt ./
+RUN pip install wheel && pip wheel -r requirements.txt
+
+FROM python:3.11.0-slim-buster
+
 LABEL authors="Nick"
+ENV TINI_VERSION="v0.19.0"
 
-# 设置工作目录为/app
-WORKDIR /app
-# 将当前目录下的所有文件打包进入镜像
-ADD . /app
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
 
-# 安装requirements.txt中指定的Python包
-RUN pip install -r /app/requirements.txt
+RUN groupadd -g 61000 app && useradd -g 61000 -l -M -s /bin/false -u 61000 app
+
+WORKDIR /usr/src/app
+
+# 复制构建阶段生成的wheel包
+COPY --from=builder /usr/src/wheels /usr/src/wheels
+COPY requirements.txt ./
+
+RUN pip install -r requirements.txt -f ./ \
+    && rm -rf /usr/src/wheels \
+    && rm -rf /root/.cache/pip/*
+
+# 复制应用源代码
+COPY . /usr/src/app
 
 EXPOSE 5000
-# 设置容器启动时执行的命令
+
+USER app
+ENTRYPOINT ["/tini", "--"]
 CMD ["python", "index.py"]
