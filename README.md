@@ -24,6 +24,22 @@ python index.py
 
 打开浏览器访问`http://localhost:8080`
 
+## Docker
+
+### Build
+```shell
+docker build -t nickdlk/net-snip:latest .
+```
+### Run
+```shell
+docker run -d -p 8080:8080 nickdlk/net-snip:latest
+```
+
+### Docker Compose
+```shell
+docker-compose up -d
+```
+
 ## TODO
 1. [x] 支持MarkDown格式
 2. [x] 支持密码访问
@@ -35,7 +51,7 @@ python index.py
 8. [ ] 增加分享超时时间
 9. [ ] 增加查看次数
 10. [x] Vercel部署
-11. [ ] Dockerfile
+11. [x] Dockerfile,Docker Compose
 12. [ ] 定时清理
 13. [ ] 分享连接,二维码分享,支持分享只读链接,对key进行加密分享
 14. [ ] 优化页面布局

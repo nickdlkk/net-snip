@@ -80,7 +80,7 @@ def snip(key, password):
     if not key_pwd:
         print("check password error")
         with use_scope(View.password_scop):
-            pwd = input("Input password", name="enter password:", type=PASSWORD)
+            pwd = input("Input password", name="password", type=PASSWORD)
         snip(key, pwd)
     else:
         with put_loading():

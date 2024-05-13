@@ -1,4 +1,4 @@
-version: '3.8'
+version: '2'
 
 services:
   postgres:
@@ -13,19 +13,24 @@ services:
       - snip_network
 
   net_snip:
-    image: net-snip
+    image: nickdlk/net-snip:latest
     depends_on:
       - postgres
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DATABASE=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - FILE_LIMIT_SIZE=5M
+      - FILE_LIMIT_TOTAL_SIZE=50M
     entrypoint: [ "/tini", "--" ]
     command: [ "python", "index.py" ]
     ports:
       - "5000:5000"
     networks:
       - snip_network
-    deploy:
-      replicas: 1  # 部署的容器实例数量
-      restart_policy:
-        condition: on-failure  # 定义重启策略
+    restart: on-failure
 
 networks:
   snip_network:
