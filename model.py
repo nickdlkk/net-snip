@@ -104,7 +104,7 @@ def check_key_pwd(key, password):
         info = cursor.fetchone()
         print(info)
         if info is None:
-            return False
+            return True
         if info[0] == key and info[1] == password:
             return True
         else:

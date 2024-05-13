@@ -29,13 +29,7 @@ def main():
     if key is None:
         put_button("generate new key", onclick=generate_new_key)
         key = input("输入key")
-        with put_loading():
-            put_text("Check key ...")
-            result = model.check_key_exist(key)
-        if result is None:
-            with put_loading():
-                put_text("Save new key ...")
-                model.save_key(key, "")
+        check_key(key)
         js = """
                 let url = new URL(window.location.href);
                 url.searchParams.set('key', key);
@@ -44,7 +38,18 @@ def main():
         run_js(js, key=key)
     else:
         pwd = pywebio_battery.get_query("password")
+        check_key(key)
         snip(key, pwd)
+
+
+def check_key(key):
+    with put_loading():
+        put_text("Check key ...")
+        result = model.check_key_exist(key)
+    if result is None:
+        with put_loading():
+            put_text("Save new key ...")
+            model.save_key(key, "")
 
 
 def generate_new_key():
