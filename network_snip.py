@@ -64,7 +64,6 @@ def rander_update_password():
 
 def snip(key, password):
     local.key = key
-    # model.save_key(key)
     kv = store.get_local()
     if kv is not None and kv.get(key) is not None and password != "":
         password = kv.get(key)
@@ -77,7 +76,9 @@ def snip(key, password):
             pwd = input("Input password", type=PASSWORD)
         snip(key, pwd)
     else:
-        content_value = model.get_by_key(key)
+        with put_loading():
+            put_text("Loading Data...")
+            content_value = model.get_by_key(key)
         kv[key] = password
         store.save_local(kv)
         local.key_id = content_value[0]['id']
@@ -123,7 +124,9 @@ def render_file_scop():
                         max_size=Config.file_limit_size,
                         max_total_size=Config.file_limit_total_size)
         put_button('Upload', onclick=file_upload_onclick)
-        files = model.list_file(local.key_id)
+        with put_loading():
+            put_text("Loading Data...")
+            files = model.list_file(local.key_id)
         for file in files:
             put_link("{} (size :{} create time: {}".format(file['file_name'], file['file_size'],
                                                            file['create_time'].strftime("%Y-%m-%d %H:%M:%S")),
