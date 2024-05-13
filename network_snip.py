@@ -84,7 +84,7 @@ def snip(key, password):
         snip(key, pwd)
     else:
         with put_loading():
-            put_text("Save new key...")
+            put_text("Loading data ...")
             content_value = model.get_by_key(key)
         kv[key] = password
         store.save_local(kv)
