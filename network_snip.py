@@ -72,8 +72,7 @@ def snip(key, password):
     if not model.check_key_pwd(key, password):
         print("check password error")
         with use_scope(View.password_scop):
-            put_text("enter password:")
-            pwd = input("Input password", type=PASSWORD)
+            pwd = input("Input password", name="enter password:", type=PASSWORD)
         snip(key, pwd)
     else:
         with put_loading():
@@ -86,9 +85,10 @@ def snip(key, password):
         put_text("key:", key)
 
         rander_update_password()
-
-        put_text("create time:", content_value[0]["create_time"])
-        put_text("update time:", content_value[0]["update_time"])
+        put_row([
+            put_text("create time:", content_value[0]["create_time"].strftime("%Y-%m-%d %H:%M:%S")),
+            put_text("update time:", content_value[0]["update_time"].strftime("%Y-%m-%d %H:%M:%S"))
+        ])
         put_markdown("""# Markdown Live Preview
         The online markdown editor with live preview. The source code of this application is [here](https://github.com/wang0618/PyWebIO/blob/dev/demos/markdown_previewer.py).
         ## Write your Content With Markdown
@@ -128,8 +128,8 @@ def render_file_scop():
             put_text("Loading Data...")
             files = model.list_file(local.key_id)
         for file in files:
-            put_link("{} (size :{} create time: {}".format(file['file_name'], file['file_size'],
-                                                           file['create_time'].strftime("%Y-%m-%d %H:%M:%S")),
+            put_link("{} (size :{} create time: {})".format(file['file_name'], file['file_size'],
+                                                            file['create_time'].strftime("%Y-%m-%d %H:%M:%S")),
                      url="/download?m={}&fid={}&kid={}".format(file['file_md5'], file['id'], local.key_id),
                      new_window=True)
         # put_button('Download', onclick=lambda _: pin.file.download_file(model.download_file))
@@ -177,7 +177,7 @@ def save_content(val):
             time_now = datetime.datetime.now()
             model.save_content(key_id, pin['md_text'], time_now)
     with use_scope(View.update_time_scop, clear=True):
-        put_text("content update time:", time_now)
+        put_text("content update time:", time_now.strftime("%Y-%m-%d %H:%M:%S"))
     toast("save success!", color='success')
 
 
