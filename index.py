@@ -1,11 +1,11 @@
 import hashlib
+from urllib.parse import quote
 
 import pywebio
+from flask import request
 
 import model
 from network_snip import main
-from flask import Flask, request, send_file
-from urllib.parse import quote
 
 app = pywebio.platform.flask.wsgi_app(main)
 
