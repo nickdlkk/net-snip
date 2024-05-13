@@ -1,3 +1,5 @@
+import time
+
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
@@ -39,6 +41,9 @@ def main():
     else:
         pwd = pywebio_battery.get_query("password")
         snip(key, pwd)
+    # 主程序需要保活,用于在Vercel等无服务上保持运行
+    while True:
+        time.sleep(1)
 
 
 def generate_new_key():
