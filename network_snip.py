@@ -29,9 +29,13 @@ def main():
     if key is None:
         put_button("generate new key", onclick=generate_new_key)
         key = input("输入key")
-        result = model.check_key_exist(key)
+        with put_loading():
+            put_text("Loading Data...")
+            result = model.check_key_exist(key)
         if result is None:
-            model.save_key(key, "")
+            with put_loading():
+                put_text("Loading Data...")
+                model.save_key(key, "")
         js = """
                 let url = new URL(window.location.href);
                 url.searchParams.set('key', key);
@@ -51,7 +55,9 @@ def generate_new_key():
             url.searchParams.set('key', key);
             window.location.href = url.toString();
             """
-    model.save_key(key, "")
+    with put_loading():
+        put_text("Loading Data...")
+        model.save_key(key, "")
     run_js(js, key=key)
 
 
