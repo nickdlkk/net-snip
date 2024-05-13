@@ -105,7 +105,9 @@ def check_key_pwd(key, password):
         print(info)
         if info is None:
             return True
+        print(info[0] == key , info[1] == password)
         if info[0] == key and info[1] == password:
+            print("密码正确")
             return True
         else:
             return False
