@@ -100,10 +100,10 @@ def snip(key, password):
             if time_ is not None:
                 put_text("content update time:", time_)
         put_textarea('md_text', rows=18, code={'mode': 'markdown'}, value=content_value[0]["value"])
-
-        put_buttons(['Download content'], lambda _: download('saved.md', pin.md_text.encode('utf8')), small=True)
-        put_buttons(['Save'], onclick=save_content, small=True)
-
+        put_row([
+            put_buttons(['Download content'], lambda _: download('saved.md', pin.md_text.encode('utf8')), small=True),
+            put_buttons(['Save'], onclick=save_content, small=True)
+        ])
         put_markdown('## Preview')
 
         with use_scope('md', clear=True):
