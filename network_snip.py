@@ -167,12 +167,15 @@ def save_content(val):
     # 主动保存后,取消自动保存
     if val == "Save":
         debouncer.cancel()
-    print(f"save_content {val}")
-    key_id = local.key_id
-    print("save key_id:{}".format(key_id))
-    print(pin['md_text'])
-    time_now = datetime.datetime.now()
-    model.save_content(key_id, pin['md_text'], time_now)
+    with use_scope(View.update_time_scop, clear=True):
+        with put_loading(shape='grow'):
+            put_text("Saving Content...")
+            print(f"save_content {val}")
+            key_id = local.key_id
+            print("save key_id:{}".format(key_id))
+            print(pin['md_text'])
+            time_now = datetime.datetime.now()
+            model.save_content(key_id, pin['md_text'], time_now)
     with use_scope(View.update_time_scop, clear=True):
         put_text("content update time:", time_now)
     toast("save success!", color='success')
