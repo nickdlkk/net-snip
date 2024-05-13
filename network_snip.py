@@ -30,11 +30,11 @@ def main():
         put_button("generate new key", onclick=generate_new_key)
         key = input("输入key")
         with put_loading():
-            put_text("Loading Data...")
+            put_text("Check key ...")
             result = model.check_key_exist(key)
         if result is None:
             with put_loading():
-                put_text("Loading Data...")
+                put_text("Save new key ...")
                 model.save_key(key, "")
         js = """
                 let url = new URL(window.location.href);
@@ -48,7 +48,6 @@ def main():
 
 
 def generate_new_key():
-    key = model.get_new_key(Config.default_word_length)
     # 生成新key后跳转
     js = """
             let url = new URL(window.location.href);
@@ -56,7 +55,8 @@ def generate_new_key():
             window.location.href = url.toString();
             """
     with put_loading():
-        put_text("Loading Data...")
+        put_text("Generate new key ...")
+        key = model.get_new_key(Config.default_word_length)
         model.save_key(key, "")
     run_js(js, key=key)
 
@@ -74,15 +74,17 @@ def snip(key, password):
     if kv is not None and kv.get(key) is not None and password != "":
         password = kv.get(key)
         print("cache password:" + password)
-
-    if not model.check_key_pwd(key, password):
+    with put_loading():
+        put_text("Check key...")
+        key_pwd = model.check_key_pwd(key, password)
+    if not key_pwd:
         print("check password error")
         with use_scope(View.password_scop):
             pwd = input("Input password", name="enter password:", type=PASSWORD)
         snip(key, pwd)
     else:
         with put_loading():
-            put_text("Loading Data...")
+            put_text("Save new key...")
             content_value = model.get_by_key(key)
         kv[key] = password
         store.save_local(kv)
