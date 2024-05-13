@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: bitnami/postgresql:latest
+    environment:
+      - POSTGRESQL_USERNAME=postgres
+      - POSTGRESQL_PASSWORD=password
+      - POSTGRESQL_DATABASE=postgres
+    volumes:
+      - postgres_data:/bitnami/postgresql
+    networks:
+      - snip_network
+
+  net_snip:
+    image: net-snip
+    ports:
+      - "5000:5000"
+    networks:
+      - snip_network
+
+networks:
+  snip_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
