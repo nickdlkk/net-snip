@@ -20,11 +20,14 @@ class WatcherThread(threading.Thread):
         self.key = key
         self.uid = uid
         self.event = event
+        self.stop = False
 
     def run(self):
-        while True:
+        while not self.stop:
             print('%s waiting for event' % threading.current_thread().name)
             self.event.wait()  # 等待事件发生
+            if self.stop:
+                break
             print('%s event received' % threading.current_thread().name)
             with use_scope(View.update_time_scop):
                 put_row([
@@ -41,6 +44,10 @@ class WatcherThread(threading.Thread):
             put_markdown(data, sanitize=False)
         with use_scope(View.update_time_scop, clear=True):
             put_text("剪贴板已更新")
+
+    def stop_thread(self):
+        self.stop = True
+        self.event.set()
 
 
 def upload_file(key_id, files):
@@ -83,7 +90,7 @@ def add_watch_thread(key, uid):
 def del_watch_thread(key, uid):
     for e in thread_dict[key]:
         if e['key'] == key and e['uid'] == uid:
-            e["thread"].stop()
+            e["thread"].stop_thread()
             thread_dict[key].remove(e)
             return
 

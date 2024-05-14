@@ -134,7 +134,13 @@ def snip(key, password):
         if time_ is not None:
             put_text("content update time:", time_)
     # 添加监听更新线程
-    service.add_watch_thread(local.key, local.uid)
+    thread = service.add_watch_thread(local.key, local.uid)
+
+    @defer_call
+    def cleanup():
+        print("close watch thread")
+        service.del_watch_thread(thread.key, thread.uid)
+
     with use_scope('md_text_scope', clear=True):
         put_textarea('md_text', rows=18, code={'mode': 'markdown'}, value=content_value[0]["value"])
     put_row([
@@ -225,9 +231,6 @@ def pin_wait_change_save(input_var):
     save_content(input_var)
 
 
-# @defer_call
-# def cleanup():
-#     service.del_watch_thread(local.key, local.uid)
 
 if __name__ == '__main__':
     start_server(main, port=8080, debug=True)
