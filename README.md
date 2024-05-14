@@ -59,6 +59,7 @@ docker-compose up -d
 16. [x] 支持输入key和生成key
 17. [ ] 生成短链
 18. [x] 多端编写同步更新
+19. [x] GitHub Action 自动打包Docker
 
 # 部署
 ## Vercel
