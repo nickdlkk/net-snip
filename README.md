@@ -43,10 +43,10 @@ docker-compose up -d
 ### 设置容器自动更新
 
 ```shell
-docker run --rm \
+docker run -d \
+    --name watchtower \
     -v /var/run/docker.sock:/var/run/docker.sock \
     containrrr/watchtower \
-    --run-once \
     net_snip
 ```
 

@@ -7,7 +7,7 @@ from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
 from pywebio.pin import *
-from pywebio.session import local, defer_call
+from pywebio.session import local, defer_call, eval_js
 from pywebio.session import set_env, download, run_js
 from pywebio.session import info as session_info
 
@@ -147,6 +147,7 @@ def snip(key, password):
         put_textarea('md_text', rows=18, code={'mode': 'markdown'}, value=content_value[0]["value"])
     put_row([
         put_buttons(['Download content'], lambda _: download('saved.md', pin.md_text.encode('utf8')), small=True),
+        put_buttons(['Copy'], onclick=lambda _: copy_content(pin['md_text']), small=True),
         put_buttons(['Save'], onclick=save_content, small=True)
     ])
     put_markdown('## Preview')
@@ -156,12 +157,10 @@ def snip(key, password):
         if value_ is not None:
             put_markdown(value_, sanitize=False)
     with use_scope('share'):
-        query_dict = pywebio_battery.get_all_query()
-        query_string = urlencode(query_dict)
-        url = session_info.origin
-        full_url = url + '?' + query_string
+        current_url = eval_js("window.location.href")
         put_markdown('## Share')
-        put_image(service.get_qrcode(full_url))
+        put_image(service.get_qrcode(current_url)).onclick(lambda: copy_content(current_url))
+        put_markdown('点击二维码复制链接')
     while True:
         change_detail = pin_wait_change('md_text')
         with use_scope('md', clear=True):
@@ -231,6 +230,29 @@ def save_content(val):
     with use_scope(View.update_time_scop, clear=True):
         put_text("content update time:", time_now.strftime("%Y-%m-%d %H:%M:%S"))
     toast("save success!", color='success')
+
+
+def copy_content(val):
+    print(val)
+    CLIPBOARD_SETUP = """
+    (function() {
+        var txt = text;
+        const input = document.createElement('textarea');
+        input.style.opacity  = 0;
+        input.style.position = 'absolute';
+        input.style.left = '-100000px';
+        document.body.appendChild(input);
+        input.value = txt;
+        input.select();
+        input.setSelectionRange(0, txt.length);
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        return "true";
+    })()
+    """
+    function_res = eval_js(CLIPBOARD_SETUP, text=val)
+    if function_res:
+        toast("copy success!", color='success')
 
 
 @debouncer.debounce
