@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from urllib.parse import urlencode
 
 import pywebio_battery
 from pywebio import start_server
@@ -8,6 +9,7 @@ from pywebio.output import *
 from pywebio.pin import *
 from pywebio.session import local, defer_call
 from pywebio.session import set_env, download, run_js
+from pywebio.session import info as session_info
 
 import model
 import service
@@ -153,7 +155,13 @@ def snip(key, password):
         value_ = content_value[0]["value"]
         if value_ is not None:
             put_markdown(value_, sanitize=False)
-
+    with use_scope('share'):
+        query_dict = pywebio_battery.get_all_query()
+        query_string = urlencode(query_dict)
+        url = session_info.origin
+        full_url = url + '?' + query_string
+        put_markdown('## Share')
+        put_image(service.get_qrcode(full_url))
     while True:
         change_detail = pin_wait_change('md_text')
         with use_scope('md', clear=True):
@@ -229,7 +237,6 @@ def save_content(val):
 def pin_wait_change_save(input_var):
     print(f"pin_wait_change_save received: {input_var}")
     save_content(input_var)
-
 
 
 if __name__ == '__main__':

@@ -1,7 +1,8 @@
 import hashlib
 import threading
+from io import BytesIO
 
-from pywebio import pin
+import qrcode
 from pywebio.output import use_scope, put_text, put_row, put_button, put_markdown
 from pywebio.pin import put_textarea
 from pywebio.session import register_thread
@@ -103,5 +104,29 @@ def push_watch_event(key, uid, data):
         t['event'].set()
 
 
-if "__main__" == __name__:
-    upload_file(1, None, None)
+def get_qrcode(url):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    # 将图片保存到字节流中
+    byte_io = BytesIO()
+    img.save(byte_io)
+    byte_io.seek(0)
+
+    # 获取字节类型数据
+    byte_data = byte_io.read()
+
+    return byte_data
+
+
+if __name__ == '__main__':
+    # upload_file(1, None, None)
+    img = get_qrcode("https://github.com/")
+    print(img)
+    # img.save('qrcode.png')
