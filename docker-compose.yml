@@ -14,6 +14,7 @@ services:
 
   net_snip:
     image: nickdlk/net-snip:latest
+    container_name: net_snip
     depends_on:
       - postgres
     environment:

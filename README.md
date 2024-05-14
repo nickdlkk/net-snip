@@ -40,6 +40,16 @@ docker run -d -p 8080:8080 nickdlk/net-snip:latest
 docker-compose up -d
 ```
 
+### 设置容器自动更新
+
+```shell
+docker run --rm \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    containrrr/watchtower \
+    --run-once \
+    net_snip
+```
+
 ## TODO
 1. [x] 支持MarkDown格式
 2. [x] 支持密码访问
