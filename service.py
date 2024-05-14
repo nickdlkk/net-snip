@@ -1,9 +1,46 @@
 import hashlib
+import threading
 
+from pywebio import pin
+from pywebio.output import use_scope, put_text, put_row, put_button, put_markdown
+from pywebio.pin import put_textarea
+from pywebio.session import register_thread
 from pywebio.utils import parse_file_size
 
 import model
 from config import Config
+from view import View
+
+thread_dict = {}
+
+
+class WatcherThread(threading.Thread):
+    def __init__(self, key, uid, event):
+        super().__init__()
+        self.key = key
+        self.uid = uid
+        self.event = event
+
+    def run(self):
+        while True:
+            print('%s waiting for event' % threading.current_thread().name)
+            self.event.wait()  # 等待事件发生
+            print('%s event received' % threading.current_thread().name)
+            with use_scope(View.update_time_scop):
+                put_row([
+                    put_text("当前剪贴板有更新!"),
+                    put_button("点击更新", onclick=self.update_content)
+                ])
+            self.event.clear()
+
+    def update_content(self):
+        data = self.event.data
+        with use_scope('md_text_scope', clear=True):
+            put_textarea('md_text', rows=18, code={'mode': 'markdown'}, value=data)
+        with use_scope('md', clear=True):
+            put_markdown(data, sanitize=False)
+        with use_scope(View.update_time_scop, clear=True):
+            put_text("剪贴板已更新")
 
 
 def upload_file(key_id, files):
@@ -23,6 +60,40 @@ def upload_file(key_id, files):
     return "上传成功"
 
 
+def add_watch_thread(key, uid):
+    """
+    将线程添加到线程池中
+    :param key: 线程的key
+    :param uid: 用户id
+    :param thread: 线程对象
+    """
+
+    if key not in thread_dict:
+        thread_dict[key] = {}
+    event = threading.Event()
+    thread = WatcherThread(key, uid, event)
+    register_thread(thread)
+    thread.start()
+    if len(thread_dict[key]) == 0:
+        thread_dict[key] = []
+    thread_dict[key].append({"key": key, "uid": uid, "thread": thread, "event": event})
+    return thread
+
+
+def del_watch_thread(key, uid):
+    for e in thread_dict[key]:
+        if e['key'] == key and e['uid'] == uid:
+            e["thread"].stop()
+            thread_dict[key].remove(e)
+            return
+
+
+def push_watch_event(key, uid, data):
+    for t in thread_dict[key]:
+        if t['uid'] == uid:
+            continue
+        t['event'].data = data
+        t['event'].set()
 
 
 if "__main__" == __name__:

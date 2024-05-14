@@ -1,11 +1,12 @@
 import datetime
+import uuid
 
 import pywebio_battery
 from pywebio import start_server
 from pywebio.input import *
 from pywebio.output import *
 from pywebio.pin import *
-from pywebio.session import local
+from pywebio.session import local, defer_call
 from pywebio.session import set_env, download, run_js
 
 import model
@@ -22,6 +23,7 @@ db_init.init()
 
 def main():
     set_env(title='网络剪贴板', output_animation=False)
+    local.uid = uuid.uuid4()
     key = pywebio_battery.get_query("key")
     if key is None:
         put_button("generate new key", onclick=generate_new_key)
@@ -131,7 +133,10 @@ def snip(key, password):
         time_ = content_value[0]["content_update_time"]
         if time_ is not None:
             put_text("content update time:", time_)
-    put_textarea('md_text', rows=18, code={'mode': 'markdown'}, value=content_value[0]["value"])
+    # 添加监听更新线程
+    service.add_watch_thread(local.key, local.uid)
+    with use_scope('md_text_scope', clear=True):
+        put_textarea('md_text', rows=18, code={'mode': 'markdown'}, value=content_value[0]["value"])
     put_row([
         put_buttons(['Download content'], lambda _: download('saved.md', pin.md_text.encode('utf8')), small=True),
         put_buttons(['Save'], onclick=save_content, small=True)
@@ -208,6 +213,7 @@ def save_content(val):
             print(pin['md_text'])
             time_now = datetime.datetime.now()
             model.save_content(key_id, pin['md_text'], time_now)
+            service.push_watch_event(local.key, local.uid, pin['md_text'])
     with use_scope(View.update_time_scop, clear=True):
         put_text("content update time:", time_now.strftime("%Y-%m-%d %H:%M:%S"))
     toast("save success!", color='success')
@@ -218,6 +224,10 @@ def pin_wait_change_save(input_var):
     print(f"pin_wait_change_save received: {input_var}")
     save_content(input_var)
 
+
+# @defer_call
+# def cleanup():
+#     service.del_watch_thread(local.key, local.uid)
 
 if __name__ == '__main__':
     start_server(main, port=8080, debug=True)
