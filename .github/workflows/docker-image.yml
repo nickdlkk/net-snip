@@ -83,7 +83,7 @@ jobs:
         name: Generate artifact attestation (docker.io)
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: docker.io/${{ env.DOCKER_HUB_IMAGE_NAME }}
+          subject-name: index.docker.io/${{ env.DOCKER_HUB_IMAGE_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
     -   
